@@ -2,7 +2,7 @@ import streamlit as st
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 
 
@@ -40,36 +40,69 @@ def listar_eventos(service, calendar_id, name):
             st.write(f"- {event.get('summary', 'Sin título')} ({event.get('start')})")
 
 
-
-def crear_evento(service, calendar_id, summary, start_time, end_time):
-    # Convertir date a datetime (si es necesario)
-    if not isinstance(start_time, datetime):
-        start_time = datetime.combine(start_time, time(8, 0))  # 08:00 AM
-    if not isinstance(end_time, datetime):
-        end_time = datetime.combine(end_time, time(9, 0))      # 09:00 AM
-
-    event = {
-        'summary': summary,
-        'start': {
-            'dateTime': start_time.isoformat(),
-            'timeZone': 'America/Bogota',
-        },
-        'end': {
-            'dateTime': end_time.isoformat(),
-            'timeZone': 'America/Bogota',
-        },
-        'description': "Descripción del evento de prueba",
+def crear_evento(service, calendar_id, events, fecha_inicio, fecha_fin):
+    dias_semana_map = {
+        "LUNES": 0,
+        "MARTES": 1,
+        "MIERCOLES": 2,
+        "JUEVES": 3,
+        "VIERNES": 4,
+        "SABADO": 5,
+        "DOMINGO": 6
     }
 
-    try:
-        created_event = service.events().insert(
-            calendarId=calendar_id, body=event
-        ).execute()
-        st.success(f"✅ Evento creado: {created_event.get('htmlLink')}")
-    except Exception as e:
-        st.error(f"❌ Error al crear el evento: {e}")
-    except HttpError as e:
-        st.error(f"Error al crear el evento: {e}")
-    except Exception as e:
-        st.error(f"Error inesperado al crear el evento: {e}")
+    
+
+    for idx, row in events.iterrows():
+        try:
+            # Parsear horas (formato HH:MM)
+            start_time = datetime.strptime(str(row['Start Time']), "%H:%M").time()
+            end_time = datetime.strptime(str(row['End Time']), "%H:%M").time()
+
+            # Lista de días permitidos convertidos a números
+            dias_evento = [dias_semana_map[d.strip()] for d in row["Days"].split(",")]
+
+            # Iterar desde fecha_inicio hasta fecha_fin
+            current_date = fecha_inicio
+            while current_date <= fecha_fin:
+                if current_date.weekday() in dias_evento:
+                    start_datetime = datetime.combine(current_date, start_time).isoformat()
+                    end_datetime = datetime.combine(current_date, end_time).isoformat()
+
+                    event = {
+                        'summary': row["SUBJECT"],
+                        'start': {
+                            'dateTime': start_datetime,
+                            'timeZone': 'America/Bogota',
+                        },
+                        'end': {
+                            'dateTime': end_datetime,
+                            'timeZone': 'America/Bogota',
+                        },
+                        'description': row["Location"]
+                    }
+
+                    created_event = service.events().insert(
+                        calendarId=calendar_id, body=event
+                    ).execute()
+
+                    st.success(f"✅ Evento creado para {current_date.strftime('%Y-%m-%d')} : {created_event.get('htmlLink')}")
+
+                current_date += timedelta(days=1)
+
+        except ValueError as ve:
+            st.error(f"❌ Error de formato: {ve}")
+        except Exception as e:
+            st.error(f"❌ Error al crear el evento: {e}")
+
+    
+def listar_horas(events):
+    st.info("Horas iniciales:")
+    for hora in events['Start Time']:
+        st.write(f"- {hora}")
+                
+    st.info("Horas finales:")
+    for hora in events['End Time']:
+        st.write(f"- {hora}")
+
 
