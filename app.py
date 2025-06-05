@@ -53,7 +53,7 @@ if datos is not None:
             submit = st.form_submit_button("📅 Agendar eventos")
 
             if submit:
-                st.write(f"Calendario seleccionado: {calendar_nombre} (ID: {calendar_id})")
+                st.write(f"Calendario seleccionado: {calendar_nombre}")
                 service = conectar_google_calendar()
                 crear_evento(service, calendar_id, events, start, end) 
 
@@ -94,6 +94,6 @@ with st.form("delete_form"):
     delete = st.form_submit_button("❌ Eliminar eventos")
 
     if delete:
-        st.write(f"Calendario seleccionado: {calendar_nombre} (ID: {calendar_id})")
+        st.write(f"Calendario seleccionado: {calendar_nombre}")
         service = conectar_google_calendar()
         eliminar_eventos(service, calendar_id, start, end)
