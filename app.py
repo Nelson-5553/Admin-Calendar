@@ -13,7 +13,7 @@ calendars = pd.read_excel("datos/Calendarios.xlsx")
 if datos is not None:
     try:
         # Leer hoja específica
-        events = pd.read_excel(datos, sheet_name="A101 V3")
+        events = pd.read_excel(datos)
 
         st.success("✅ Archivo cargado exitosamente.")
         st.write("🔍 Vista previa de los datos:")
@@ -56,7 +56,7 @@ if datos is not None:
 
             with middle:
                 delete = st.form_submit_button("❌ Eliminar eventos")
-                
+
             if submit:
     
                 st.write(f"Calendario seleccionado: {calendar_nombre} (ID: {calendar_id})")
