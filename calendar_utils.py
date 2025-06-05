@@ -115,6 +115,9 @@ def eliminar_eventos(service, calendar_id, start_date, end_date):
         eliminados = 0
         page_token = None
 
+        mensaje_estado = st.empty()
+        mensaje_estado.info("⏳ Eliminando datos...")
+
         while True:
             events_result = service.events().list(
                 calendarId=calendar_id,
@@ -138,7 +141,7 @@ def eliminar_eventos(service, calendar_id, start_date, end_date):
             if not page_token:
                 break
 
-        st.success(f"✅ Se eliminaron {eliminados} eventos entre {start_date} y {end_date}.")
+        mensaje_estado.success(f"✅ Se eliminaron {eliminados} eventos entre {start_date} y {end_date}.")
 
     except Exception as e:
         st.error(f"❌ Error al eliminar eventos: {e}")
