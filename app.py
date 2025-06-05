@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from calendar_utils import conectar_google_calendar, listar_eventos
+from calendar_utils import conectar_google_calendar, listar_eventos, crear_evento
 
 st.title('📆 Exportar calendario a Google')
 
@@ -14,7 +14,7 @@ calendar_id = pd.read_excel("datos/Calendarios.xlsx")
 if datos is not None:
     try:
         # Leer hoja específica
-        df = pd.read_excel(datos)
+        df = pd.read_excel(datos, sheet_name="A101 V3")
 
         st.success("✅ Archivo cargado exitosamente.")
         st.write("🔍 Vista previa de los datos:")
@@ -34,6 +34,9 @@ if datos is not None:
                 calendar_id['Nombre'] == calendar_nombre, 'Id'
             ].values[0]
 
+            st.date_input("Inicio de semestre", value="today", min_value=None, max_value=None, key=None)
+            st.date_input("Fin de semestre", value="today", min_value=None, max_value=None, key=None)
+
             submit = st.form_submit_button("📅 Agendar eventos")
 
             if submit:
@@ -41,12 +44,9 @@ if datos is not None:
                 # st.write(f"Calendario seleccionado: {calendar_nombre} (ID: {calendar_id})")
                 
                 service = conectar_google_calendar()
-
-                listar_eventos(service, calendar_id)
-
-            
-              
-                st.success("✅ Eventos agendados (simulado)")
+                
+                crear_evento(service, calendar_id)
+                
 
     except Exception as e:
         st.error(f"❌ Error al leer la hoja 'A101 V3': {e}")
