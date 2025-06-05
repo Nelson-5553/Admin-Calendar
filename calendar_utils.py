@@ -1,5 +1,6 @@
 import streamlit as st
 from google.oauth2 import service_account
+import asyncio
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from datetime import datetime, time, timedelta
@@ -51,18 +52,18 @@ def crear_evento(service, calendar_id, events, fecha_inicio, fecha_fin):
         "DOMINGO": 6
     }
 
-    
+    mensaje_estado = st.empty()
+    mensaje_estado.info("⏳ Procesando datos...")
+
+    eventos_creados = 0
 
     for idx, row in events.iterrows():
         try:
-            # Parsear horas (formato HH:MM)
             start_time = datetime.strptime(str(row['Start Time']), "%H:%M").time()
             end_time = datetime.strptime(str(row['End Time']), "%H:%M").time()
 
-            # Lista de días permitidos convertidos a números
             dias_evento = [dias_semana_map[d.strip()] for d in row["Days"].split(",")]
 
-            # Iterar desde fecha_inicio hasta fecha_fin
             current_date = fecha_inicio
             while current_date <= fecha_fin:
                 if current_date.weekday() in dias_evento:
@@ -82,11 +83,12 @@ def crear_evento(service, calendar_id, events, fecha_inicio, fecha_fin):
                         'description': row["Location"]
                     }
 
-                    created_event = service.events().insert(
+                    service.events().insert(
                         calendarId=calendar_id, body=event
                     ).execute()
 
-                    st.success(f"✅ Evento creado para {current_date.strftime('%Y-%m-%d')} : {created_event.get('htmlLink')}")
+                    eventos_creados += 1
+                    mensaje_estado.info(f"⏳ Procesando datos... ({eventos_creados} eventos creados)")
 
                 current_date += timedelta(days=1)
 
@@ -94,6 +96,8 @@ def crear_evento(service, calendar_id, events, fecha_inicio, fecha_fin):
             st.error(f"❌ Error de formato: {ve}")
         except Exception as e:
             st.error(f"❌ Error al crear el evento: {e}")
+
+    mensaje_estado.success(f"✅ Eventos creados exitosamente. Total: {eventos_creados}")
 
     
 def listar_horas(events):
