@@ -1,5 +1,7 @@
 # Admin-Calendar
 
+![alt text](image.png)
+
 Esta aplicación permite leer un archivo Excel con eventos y exportarlos a Google Calendar de manera sencilla usando Streamlit.
 
 ## Requisitos
