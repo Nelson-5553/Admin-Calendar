@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from calendar_utils import conectar_google_calendar, listar_eventos, crear_evento, listar_horas
+from calendar_utils import conectar_google_calendar, eliminar_eventos, crear_evento
 
 st.title('📆 Exportar calendario a Google')
 st.write('Esta aplicación permite leer un archivo Excel y preparar la exportación de eventos a Google Calendar.')
@@ -49,14 +49,26 @@ if datos is not None:
                 key=None
             )
 
-            submit = st.form_submit_button("📅 Agendar eventos")
+            left, middle = st.columns(2, vertical_alignment="bottom")
 
+            with left:
+                submit = st.form_submit_button("📅 Agendar eventos")
+
+            with middle:
+                delete = st.form_submit_button("❌ Eliminar eventos")
+                
             if submit:
     
                 st.write(f"Calendario seleccionado: {calendar_nombre} (ID: {calendar_id})")
                 
                 service = conectar_google_calendar()
                 crear_evento(service, calendar_id, events, start, end) 
+            
+            if delete:
+                st.write(f"Calendario seleccionado: {calendar_nombre} (ID: {calendar_id})")
+                
+                service = conectar_google_calendar()
+                eliminar_eventos(service, calendar_id, start, end)
 
     except Exception as e:
         st.error(f"❌ Error al leer la hoja 'A101 V3': {e}")

@@ -3,7 +3,7 @@ from google.oauth2 import service_account
 import asyncio
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, timezone
 
 
 
@@ -99,14 +99,50 @@ def crear_evento(service, calendar_id, events, fecha_inicio, fecha_fin):
 
     mensaje_estado.success(f"✅ Eventos creados exitosamente. Total: {eventos_creados}")
 
-    
-def listar_horas(events):
-    st.info("Horas iniciales:")
-    for hora in events['Start Time']:
-        st.write(f"- {hora}")
-                
-    st.info("Horas finales:")
-    for hora in events['End Time']:
-        st.write(f"- {hora}")
+
+def eliminar_eventos(service, calendar_id, start_date, end_date):
+
+    try:
+        # Definir zona horaria - ajusta si usas otra zona
+        tz = timezone(timedelta(hours=-5))  # America/Bogota es UTC-5
+
+        # Crear datetime aware para inicio y fin del rango
+        time_min = datetime.combine(start_date, time.min).replace(tzinfo=tz).isoformat()
+        time_max = datetime.combine(end_date, time.max).replace(tzinfo=tz).isoformat()
+
+        # Para API de Google Calendar, se recomienda usar formato RFC3339 con zona, sin 'Z' si no es UTC
+
+        eliminados = 0
+        page_token = None
+
+        while True:
+            events_result = service.events().list(
+                calendarId=calendar_id,
+                timeMin=time_min,
+                timeMax=time_max,
+                singleEvents=True,
+                pageToken=page_token
+            ).execute()
+
+            events = events_result.get('items', [])
+
+            if not events and eliminados == 0:
+                st.info("No se encontraron eventos para eliminar en el rango seleccionado.")
+                break
+
+            for event in events:
+                service.events().delete(calendarId=calendar_id, eventId=event['id']).execute()
+                eliminados += 1
+
+            page_token = events_result.get('nextPageToken')
+            if not page_token:
+                break
+
+        st.success(f"✅ Se eliminaron {eliminados} eventos entre {start_date} y {end_date}.")
+
+    except Exception as e:
+        st.error(f"❌ Error al eliminar eventos: {e}")
+
+
 
 
