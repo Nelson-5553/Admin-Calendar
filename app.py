@@ -13,11 +13,11 @@ calendars = pd.read_excel("datos/Calendarios.xlsx")
 if datos is not None:
     try:
         # Leer hoja específica
-        df = pd.read_excel(datos, sheet_name="A101 V3")
+        events = pd.read_excel(datos, sheet_name="A101 V3")
 
         st.success("✅ Archivo cargado exitosamente.")
         st.write("🔍 Vista previa de los datos:")
-        st.dataframe(df)
+        st.dataframe(events)
 
         # Formulario para agendar
         with st.form("my_form"):
