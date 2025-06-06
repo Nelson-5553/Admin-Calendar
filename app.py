@@ -13,7 +13,7 @@ calendars = pd.read_excel("datos/Calendarios.xlsx")
 if datos is not None:
     try:
         # Leer hoja específica
-        events = pd.read_excel(datos, sheet_name='A101 V3')
+        events = pd.read_excel(datos)
 
         st.success("✅ Archivo cargado exitosamente.")
         st.write("🔍 Vista previa de los datos:")
