@@ -4,6 +4,8 @@
 
 Esta aplicación permite leer un archivo Excel con eventos y exportarlos a Google Calendar de manera sencilla usando Streamlit.
 
+[SHOWCASE](https://drive.google.com/file/d/17fLPCBUjcZmhq45DaTjvMPBY1CfqmvxH/view?usp=sharing)
+
 ## Requisitos
 
 - Python 3.0 o superior
