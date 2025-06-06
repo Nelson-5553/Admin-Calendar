@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 from calendar_utils import conectar_google_calendar, eliminar_eventos, crear_evento
 
-st.title('📆 Exportar calendario a Google')
-st.write('Esta aplicación permite leer un archivo Excel y preparar la exportación de eventos a Google Calendar.')
+st.title('📆 Admin Calendar')
+st.write('Esta aplicación permite leer un archivo Excel y preparar la importacion de eventos a Google Calendar.')
 
 # Subir archivo
 datos = st.file_uploader("📤 Sube tu archivo Excel", type=["xlsx"])
