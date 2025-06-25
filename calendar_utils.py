@@ -80,7 +80,7 @@ def crear_evento(service, calendar_id, events, fecha_inicio, fecha_fin):
                             'dateTime': end_datetime,
                             'timeZone': 'America/Bogota',
                         },
-                        'description': row["Location"]
+                        'description': 'CRUCES ACADEMICOS'
                     }
 
                     service.events().insert(
@@ -134,8 +134,9 @@ def eliminar_eventos(service, calendar_id, start_date, end_date):
                 break
 
             for event in events:
-                service.events().delete(calendarId=calendar_id, eventId=event['id']).execute()
-                eliminados += 1
+                if event.get('description', '') == 'CRUCES ACADEMICOS':
+                    service.events().delete(calendarId=calendar_id, eventId=event['id']).execute()
+                    eliminados += 1
 
             page_token = events_result.get('nextPageToken')
             if not page_token:
