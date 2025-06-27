@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 from calendar_utils import conectar_google_calendar, eliminar_eventos, crear_evento
 
+st.set_page_config(
+    page_title="Admin Calendar",
+    page_icon="calendar.svg"  # Reemplaza con la ruta correcta
+)
+
 st.title('📆 Admin Calendar')
 st.write('Esta aplicación permite leer un archivo Excel y preparar la importacion de eventos a Google Calendar.')
 
